@@ -1,0 +1,13 @@
+.App {
+  display: grid;
+  place-items: center;
+}
+
+.todo__list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 800px;
+  border: 1px solid lightgray;
+  margin-bottom: 10px !important;
+}
