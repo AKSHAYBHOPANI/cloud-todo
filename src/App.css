@@ -7,7 +7,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 800px;
   border: 1px solid lightgray;
   margin-bottom: 10px !important;
+}
+
+footer {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
+footer img {
+  width: 150px;
 }

@@ -6,6 +6,7 @@ import { googleLogout, useGoogleLogin } from "@react-oauth/google"
 import axios from "axios"
 import { db } from "./firebase.js"
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore"
+import GoogleIcon from "@mui/icons-material/Google"
 const q = query(collection(db, "todos"), orderBy("timestamp", "desc"))
 
 function App() {
@@ -16,6 +17,8 @@ function App() {
     addDoc(collection(db, "todos"), {
       todo: input,
       timestamp: serverTimestamp(),
+      name: profile.name,
+      email: profile.email,
     })
     setInput("")
   }
@@ -61,33 +64,41 @@ function App() {
   }
   return (
     <div className="App">
-      <h2> TODO List App</h2>
-
+      <nav className="header">
+        <h2>Cloud ToDo</h2>
+      </nav>
       {profile ? (
         <div>
-          <img src={profile.picture} alt="user image" />
-          <h3>User Logged in</h3>
-          <p>Name: {profile.name}</p>
-          <p>Email Address: {profile.email}</p>
-          <br />
-          <br />
-          <button onClick={logOut}>Log out</button>
+          <div className="profile">
+            <img src={profile.picture} alt="user image" />
+            <h3>Welcome, {profile.name}</h3>
+            <p>{profile.email}</p>
+            <br />
+          </div>
+
+          <form onSubmit={addTodo} style={{ textAlign: "center", padding: "10px" }}>
+            <TextField id="outlined-basic" label="Make Todo" variant="outlined" style={{ margin: "0px 5px", textAlign: "center" }} size="small" value={input} onChange={(e) => setInput(e.target.value)} />
+            <button className="button" onClick={addTodo}>
+              Add Todo
+            </button>
+            <button onClick={logOut}>Log out</button>
+          </form>
+          <ul>
+            {todos.map((item) => (
+              <Todo key={item.id} arr={item} />
+            ))}
+          </ul>
         </div>
       ) : (
-        <button onClick={() => login()}>Sign in with Google 🚀 </button>
+        <div style={{ position: "absolute", top: "50%" }}>
+          <button onClick={() => login()}>
+            Sign in <GoogleIcon style={{ height: "15px" }} />
+          </button>
+        </div>
       )}
-      {/* <GoogleLogin onSuccess={responseMessage} onError={errorMessage} /> */}
-      <form onSubmit={addTodo}>
-        <TextField id="outlined-basic" label="Make Todo" variant="outlined" style={{ margin: "0px 5px" }} size="small" value={input} onChange={(e) => setInput(e.target.value)} />
-        <Button variant="contained" color="primary" onClick={addTodo}>
-          Add Todo
-        </Button>
-      </form>
-      <ul>
-        {todos.map((item) => (
-          <Todo key={item.id} arr={item} />
-        ))}
-      </ul>
+      <footer>
+        <img src={"./logo.png"} alt={"code vipassna"}></img>
+      </footer>
     </div>
   )
 }
