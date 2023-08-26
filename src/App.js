@@ -4,13 +4,19 @@ import "./App.css"
 import Todo from "./Todo.js"
 import { googleLogout, useGoogleLogin } from "@react-oauth/google"
 import axios from "axios"
+import { db } from "./firebase.js"
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore"
+const q = query(collection(db, "todos"), orderBy("timestamp", "desc"))
 
 function App() {
-  const [todos, setTodos] = useState(["Create Blockchain App", "Create a Youtube Tutorial"])
+  const [todos, setTodos] = useState([])
   const [input, setInput] = useState("")
   const addTodo = (e) => {
     e.preventDefault()
-    setTodos([...todos, input])
+    addDoc(collection(db, "todos"), {
+      todo: input,
+      timestamp: serverTimestamp(),
+    })
     setInput("")
   }
   const [user, setUser] = useState([])
@@ -37,6 +43,17 @@ function App() {
     }
   }, [user])
 
+  useEffect(() => {
+    onSnapshot(q, (snapshot) => {
+      setTodos(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          item: doc.data(),
+        }))
+      )
+    })
+  }, [input])
+
   // log out function to log the user out of google and set the profile array to null
   const logOut = () => {
     googleLogout()
@@ -60,15 +77,15 @@ function App() {
         <button onClick={() => login()}>Sign in with Google 🚀 </button>
       )}
       {/* <GoogleLogin onSuccess={responseMessage} onError={errorMessage} /> */}
-      <form>
+      <form onSubmit={addTodo}>
         <TextField id="outlined-basic" label="Make Todo" variant="outlined" style={{ margin: "0px 5px" }} size="small" value={input} onChange={(e) => setInput(e.target.value)} />
         <Button variant="contained" color="primary" onClick={addTodo}>
           Add Todo
         </Button>
       </form>
       <ul>
-        {todos.map((todo) => (
-          <Todo todo={todo} />
+        {todos.map((item) => (
+          <Todo key={item.id} arr={item} />
         ))}
       </ul>
     </div>
