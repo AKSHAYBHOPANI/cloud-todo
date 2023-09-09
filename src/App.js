@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { TextField, Button } from "@mui/material"
+import { TextField } from "@mui/material"
 import "./App.css"
 import Todo from "./Todo.js"
 import { googleLogout, useGoogleLogin } from "@react-oauth/google"
@@ -10,8 +10,13 @@ import GoogleIcon from "@mui/icons-material/Google"
 const q = query(collection(db, "todos"), orderBy("timestamp", "desc"))
 
 function App() {
+  //Local Data Variables
   const [todos, setTodos] = useState([])
   const [input, setInput] = useState("")
+  const [user, setUser] = useState([])
+  const [profile, setProfile] = useState([])
+
+  //Pushing ToDo's to Firestore
   const addTodo = (e) => {
     e.preventDefault()
     addDoc(collection(db, "todos"), {
@@ -22,15 +27,15 @@ function App() {
     })
     setInput("")
   }
-  const [user, setUser] = useState([])
-  const [profile, setProfile] = useState([])
 
+  //OAuth Google Login
   const login = useGoogleLogin({
     onSuccess: (codeResponse) => setUser(codeResponse),
     onError: (error) => console.log("Login Failed:", error),
   })
 
   useEffect(() => {
+    //if User Authenticated then fetch user details
     if (user) {
       axios
         .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
@@ -47,6 +52,7 @@ function App() {
   }, [user])
 
   useEffect(() => {
+    //Fetch Latest ToDo's to show up on UI.
     onSnapshot(q, (snapshot) => {
       setTodos(
         snapshot.docs.map((doc) => ({
@@ -57,7 +63,7 @@ function App() {
     })
   }, [input])
 
-  // log out function to log the user out of google and set the profile array to null
+  // Log out function to log the user out of google and set the profile array to null
   const logOut = () => {
     googleLogout()
     setProfile(null)
