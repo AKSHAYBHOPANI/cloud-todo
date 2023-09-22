@@ -73,7 +73,7 @@ function App() {
       <nav className="header">
         <h2>Cloud ToDo</h2>
       </nav>
-      {profile ? (
+      {profile.picture ? (
         <div>
           <div className="profile">
             <img src={profile.picture} alt="user image" />
